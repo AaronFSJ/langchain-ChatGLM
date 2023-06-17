@@ -4,6 +4,7 @@ from models.loader.args import parser
 from models.loader import LoaderCheckPoint
 from configs.model_config import (llm_model_dict, LLM_MODEL)
 from models.base import BaseAnswer
+from configs.model_config import (llm_model_dict)
 
 loaderCheckPoint: LoaderCheckPoint = None
 
@@ -34,14 +35,16 @@ def loaderLLM(llm_model: str = None, no_remote_model: bool = False, use_ptuning_
 
     loaderCheckPoint.model_path = llm_model_info["local_model_path"]
 
-    if 'FastChatOpenAILLM' in llm_model_info["provides"]:
+    if 'mode' in llm_model_info and llm_model_info["mode"] == 'remote':
         loaderCheckPoint.unload_model()
     else:
         loaderCheckPoint.reload_model()
 
     provides_class = getattr(sys.modules['models'], llm_model_info['provides'])
     modelInsLLM = provides_class(checkPoint=loaderCheckPoint)
-    if 'FastChatOpenAILLM' in llm_model_info["provides"]:
+    if 'mode' in llm_model_info and llm_model_info["mode"] == 'remote':
         modelInsLLM.set_api_base_url(llm_model_info['api_base_url'])
+        modelInsLLM.set_api_key(llm_model_info['api_key'])
         modelInsLLM.call_model_name(llm_model_info['name'])
+
     return modelInsLLM

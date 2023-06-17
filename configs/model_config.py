@@ -16,7 +16,7 @@ embedding_model_dict = {
     "ernie-tiny": "nghuyong/ernie-3.0-nano-zh",
     "ernie-base": "nghuyong/ernie-3.0-base-zh",
     "text2vec-base": "shibing624/text2vec-base-chinese",
-    "text2vec": "GanymedeNil/text2vec-large-chinese",
+    "text2vec": "/home/tnet/opt/models/embedding-models/text2vec-large-chinese",
     "m3e-small": "moka-ai/m3e-small",
     "m3e-base": "moka-ai/m3e-base",
 }
@@ -54,7 +54,7 @@ llm_model_dict = {
     },
     "chatglm-6b": {
         "name": "chatglm-6b",
-        "pretrained_model_name": "THUDM/chatglm-6b",
+        "pretrained_model_name": "/home/tnet/opt/models/llm-models/chatglm-6b",
         "local_model_path": None,
         "provides": "ChatGLM"
     },
@@ -83,6 +83,7 @@ llm_model_dict = {
         "name": "chatglm-6b",  # "name"修改为fastchat服务中的"model_name"
         "pretrained_model_name": "chatglm-6b",
         "local_model_path": None,
+        "mode": "remote",
         "provides": "FastChatOpenAILLM",  # 使用fastchat api时，需保证"provides"为"FastChatOpenAILLM"
         "api_base_url": "http://localhost:8000/v1"  # "name"修改为fastchat服务中的"api_base_url"
     },
@@ -92,8 +93,38 @@ llm_model_dict = {
         "name": "vicuna-13b-hf",  # "name"修改为fastchat服务中的"model_name"
         "pretrained_model_name": "vicuna-13b-hf",
         "local_model_path": None,
+        "mode": "remote",
         "provides": "FastChatOpenAILLM",  # 使用fastchat api时，需保证"provides"为"FastChatOpenAILLM"
         "api_base_url": "http://localhost:8000/v1"  # "name"修改为fastchat服务中的"api_base_url"
+    },
+    # openai api gpt-3.5-turbo
+    "gpt-3.5-turbo": {
+        "name": "gpt-3.5-turbo",  # "name"修改为fastchat服务中的"model_name"
+        "pretrained_model_name": "gpt-3.5-turbo",
+        "local_model_path": None,
+        "mode": "remote",
+        "provides": "OpenAILLM",  # 使用fastchat api时，需保证"provides"为"FastChatOpenAILLM"
+        "api_base_url": "https://api.openapi.com/v1",  # "name"修改为fastchat服务中的"api_base_url"
+        "api_key":"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",
+    },
+     # openai api gpt-3.5-turbo-16k
+    "gpt-3.5-turbo-16k": {
+        "name": "gpt-3.5-turbo-16k",  # "name"修改为fastchat服务中的"model_name"
+        "pretrained_model_name": "gpt-3.5-turbo-16k",
+        "local_model_path": None,
+        "mode": "remote",
+        "provides": "OpenAILLM",  # 使用fastchat api时，需保证"provides"为"FastChatOpenAILLM"
+        "api_base_url": "https://api.openapi.com/v1",  # "name"修改为fastchat服务中的"api_base_url"
+        "api_key":"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",
+    },
+    # 通过星火大模型调用的模型请参考如下格式
+    "spark": {
+        "name": "spark",  # "name"修改为fastchat服务中的"model_name"
+        "pretrained_model_name": "spark",
+        "local_model_path": None,
+        "mode": "remote",
+        "provides": "Spark",  # 使用星火大模型 api时，需保证"provides"为"Spark"
+        "api_base_url": "wss://spark-api.xf-yun.com/v1.1/chat"  # "name"修改为fastchat服务中的"api_base_url"
     },
 }
 
@@ -102,9 +133,10 @@ LLM_MODEL = "chatglm-6b"
 # 量化加载8bit 模型
 LOAD_IN_8BIT = False
 # Load the model with bfloat16 precision. Requires NVIDIA Ampere GPU.
-BF16 = False
+BF16 = True
 # 本地lora存放的位置
 LORA_DIR = "loras/"
+
 
 # LLM lora path，默认为空，如果有请直接指定文件夹路径
 LLM_LORA_PATH = ""
@@ -144,7 +176,7 @@ LLM_HISTORY_LEN = 3
 VECTOR_SEARCH_TOP_K = 5
 
 # 知识检索内容相关度 Score, 数值范围约为0-1100，如果为0，则不生效，经测试设置为小于500时，匹配结果更精准
-VECTOR_SEARCH_SCORE_THRESHOLD = 0
+VECTOR_SEARCH_SCORE_THRESHOLD =300
 
 NLTK_DATA_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "nltk_data")
 
