@@ -55,7 +55,7 @@ llm_model_dict = {
     "chatglm-6b": {
         "name": "chatglm-6b",
         "pretrained_model_name": "/home/tnet/opt/models/llm-models/chatglm-6b",
-        "local_model_path": None,
+        "local_model_path": "/home/tnet/opt/models/llm-models/chatglm-6b",
         "provides": "ChatGLM"
     },
 
@@ -129,11 +129,11 @@ llm_model_dict = {
 }
 
 # LLM 名称
-LLM_MODEL = "chatglm-6b"
+LLM_MODEL = "gpt-3.5-turbo-16k"
 # 量化加载8bit 模型
 LOAD_IN_8BIT = False
 # Load the model with bfloat16 precision. Requires NVIDIA Ampere GPU.
-BF16 = True
+BF16 = False
 # 本地lora存放的位置
 LORA_DIR = "loras/"
 
@@ -167,16 +167,16 @@ CACHED_VS_NUM = 1
 SENTENCE_SIZE = 100
 
 # 匹配后单段上下文长度
-CHUNK_SIZE = 250
+CHUNK_SIZE = 500
 
 # 传入LLM的历史记录长度
 LLM_HISTORY_LEN = 3
 
 # 知识库检索时返回的匹配内容条数
-VECTOR_SEARCH_TOP_K = 5
+VECTOR_SEARCH_TOP_K = 3
 
 # 知识检索内容相关度 Score, 数值范围约为0-1100，如果为0，则不生效，经测试设置为小于500时，匹配结果更精准
-VECTOR_SEARCH_SCORE_THRESHOLD =300
+VECTOR_SEARCH_SCORE_THRESHOLD =0
 
 NLTK_DATA_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "nltk_data")
 

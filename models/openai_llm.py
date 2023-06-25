@@ -63,7 +63,7 @@ class OpenAILLM(RemoteRpcModel, LLM, ABC):
         return self.api_base_url
 
     def set_api_key(self, api_key: str):
-        pass
+        self.api_key = api_key
 
     def set_api_base_url(self, api_base_url: str):
         self.api_base_url = api_base_url
