@@ -1,6 +1,7 @@
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
 from vectorstores import MyFAISS
 from langchain.document_loaders import UnstructuredFileLoader, TextLoader, CSVLoader
+from langchain.text_splitter import SpacyTextSplitter
 from configs.model_config import *
 import datetime
 from textsplitter import ChineseTextSplitter
@@ -62,8 +63,18 @@ def load_file(filepath, sentence_size=SENTENCE_SIZE):
         docs = loader.load()
     elif filepath.lower().endswith(".txt"):
         loader = TextLoader(filepath, autodetect_encoding=True)
-        textsplitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
-        docs = loader.load_and_split(textsplitter)
+        documents = loader.load()
+        text_splitter = SpacyTextSplitter(chunk_size=256, pipeline="zh_core_web_sm")
+        docs = text_splitter.split_documents(documents)
+        # docs = loader.load_and_split(texts)
+        #
+        # loader = TextLoader('./file/faq.txt')
+        # documents = loader.load()
+        # text_splitter = SpacyTextSplitter(chunk_size=256, pipeline="zh_core_web_sm")
+        # texts = text_splitter.split_documents(documents)
+
+        # textsplitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
+        # docs = loader.load_and_split(textsplitter)
     elif filepath.lower().endswith(".pdf"):
         loader = UnstructuredPaddlePDFLoader(filepath)
         textsplitter = ChineseTextSplitter(pdf=True, sentence_size=sentence_size)
@@ -76,9 +87,14 @@ def load_file(filepath, sentence_size=SENTENCE_SIZE):
         loader = CSVLoader(filepath)
         docs = loader.load()
     else:
+        # loader = UnstructuredFileLoader(filepath, mode="elements")
+        # textsplitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
+        # docs = loader.load_and_split(text_splitter=textsplitter)
         loader = UnstructuredFileLoader(filepath, mode="elements")
-        textsplitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
-        docs = loader.load_and_split(text_splitter=textsplitter)
+        documents = loader.load()
+        text_splitter = SpacyTextSplitter(chunk_size=256, pipeline="zh_core_web_sm")
+        docs = text_splitter.split_documents(documents)
+
     write_check_file(filepath, docs)
     return docs
 
@@ -206,7 +222,10 @@ class LocalDocQA:
                 return None, [one_title]
             docs = [Document(page_content=one_conent + "\n", metadata={"source": one_title})]
             if not one_content_segmentation:
-                text_splitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
+                # text_splitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
+                # docs = text_splitter.split_documents(docs)
+
+                text_splitter = SpacyTextSplitter(chunk_size=256, pipeline="zh_core_web_sm")
                 docs = text_splitter.split_documents(docs)
             if os.path.isdir(vs_path) and os.path.isfile(vs_path + "/index.faiss"):
                 vector_store = load_vector_store(vs_path, self.embeddings)
