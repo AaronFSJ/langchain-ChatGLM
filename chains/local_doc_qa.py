@@ -92,7 +92,7 @@ def load_file(filepath, sentence_size=SENTENCE_SIZE):
         # docs = loader.load_and_split(text_splitter=textsplitter)
         loader = UnstructuredFileLoader(filepath, mode="elements")
         documents = loader.load()
-        text_splitter = SpacyTextSplitter(chunk_size=256, pipeline="zh_core_web_sm")
+        text_splitter = SpacyTextSplitter(chunk_size=512, pipeline="zh_core_web_sm")
         docs = text_splitter.split_documents(documents)
 
     write_check_file(filepath, docs)
@@ -225,7 +225,7 @@ class LocalDocQA:
                 # text_splitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
                 # docs = text_splitter.split_documents(docs)
 
-                text_splitter = SpacyTextSplitter(chunk_size=256, pipeline="zh_core_web_sm")
+                text_splitter = SpacyTextSplitter(chunk_size=512, pipeline="zh_core_web_sm")
                 docs = text_splitter.split_documents(docs)
             if os.path.isdir(vs_path) and os.path.isfile(vs_path + "/index.faiss"):
                 vector_store = load_vector_store(vs_path, self.embeddings)
