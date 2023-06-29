@@ -64,25 +64,25 @@ def load_file(filepath, sentence_size=SENTENCE_SIZE):
     elif filepath.lower().endswith(".txt"):
         loader = TextLoader(filepath, autodetect_encoding=True)
         documents = loader.load()
-        text_splitter = SpacyTextSplitter(chunk_size=256, pipeline="zh_core_web_sm")
+        text_splitter = SpacyTextSplitter(chunk_size=sentence_size, pipeline="zh_core_web_sm")
         docs = text_splitter.split_documents(documents)
-        # docs = loader.load_and_split(texts)
-        #
-        # loader = TextLoader('./file/faq.txt')
-        # documents = loader.load()
-        # text_splitter = SpacyTextSplitter(chunk_size=256, pipeline="zh_core_web_sm")
-        # texts = text_splitter.split_documents(documents)
 
         # textsplitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
         # docs = loader.load_and_split(textsplitter)
     elif filepath.lower().endswith(".pdf"):
         loader = UnstructuredPaddlePDFLoader(filepath)
-        textsplitter = ChineseTextSplitter(pdf=True, sentence_size=sentence_size)
-        docs = loader.load_and_split(textsplitter)
+        documents = loader.load()
+        text_splitter = SpacyTextSplitter(chunk_size=sentence_size, pipeline="zh_core_web_sm")
+        docs = text_splitter.split_documents(documents)
+        # textsplitter = ChineseTextSplitter(pdf=True, sentence_size=sentence_size)
+        # docs = loader.load_and_split(textsplitter)
     elif filepath.lower().endswith(".jpg") or filepath.lower().endswith(".png"):
         loader = UnstructuredPaddleImageLoader(filepath, mode="elements")
-        textsplitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
-        docs = loader.load_and_split(text_splitter=textsplitter)
+        # textsplitter = ChineseTextSplitter(pdf=False, sentence_size=sentence_size)
+        # docs = loader.load_and_split(text_splitter=textsplitter)
+        documents = loader.load()
+        text_splitter = SpacyTextSplitter(chunk_size=sentence_size, pipeline="zh_core_web_sm")
+        docs = text_splitter.split_documents(documents)
     elif filepath.lower().endswith(".csv"):
         loader = CSVLoader(filepath)
         docs = loader.load()
@@ -92,12 +92,34 @@ def load_file(filepath, sentence_size=SENTENCE_SIZE):
         # docs = loader.load_and_split(text_splitter=textsplitter)
         loader = UnstructuredFileLoader(filepath, mode="elements")
         documents = loader.load()
-        text_splitter = SpacyTextSplitter(chunk_size=512, pipeline="zh_core_web_sm")
+        text_splitter = SpacyTextSplitter(chunk_size=sentence_size, pipeline="zh_core_web_sm")
         docs = text_splitter.split_documents(documents)
-
+    # printDocsToJsonArray(docs)
+    docs=documents_add_file(filepath,docs)
     write_check_file(filepath, docs)
     return docs
 
+# 向量入库前添加
+def documents_add_file(filepath,docs):
+    filename = os.path.basename(filepath)
+    for doc in docs:
+        doc.page_content = '出处：['+filename+'] '+doc.page_content
+        print(f"doc=={doc}")
+    return docs
+
+import json
+def printDocsToJsonArray(docs):
+    # 转换为可序列化的字典形式
+    serialized_docs = []
+    for doc in docs:
+        serialized_docs.append({
+            'page_content': doc.page_content,
+            'metadata': doc.metadata
+        })
+
+    # 将字典形式的对象转换为 JSON 数组
+    json_array = json.dumps(serialized_docs)
+    print(json_array)
 
 def write_check_file(filepath, docs):
     folder_path = os.path.join(os.path.dirname(filepath), "tmp_files")
